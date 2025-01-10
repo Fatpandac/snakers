@@ -9,7 +9,7 @@ use ratatui::{
     widgets::{Block, Borders},
     Frame, Terminal,
 };
-use std::{io::Stdout, process::exit, time::Duration};
+use std::{io::Stdout, time::Duration};
 
 #[derive(Debug)]
 pub struct Game {
@@ -30,7 +30,7 @@ impl Game {
             window_height: height,
             snake: Snake::new(),
             food: Food::new(),
-            fps: Fps::new(30),
+            fps: Fps::new(20),
             is_over: false,
         }
     }
@@ -84,8 +84,8 @@ impl Game {
         self.opration();
         self.snake.update_pos();
         self.food.update_food(self.window_width, self.window_height);
-        self.check_eat_food();
         self.check_game_over();
+        self.check_eat_food();
 
         frame.render_widget(
             Block::new()
@@ -114,21 +114,21 @@ impl Game {
         }
     }
 
-    fn check_game_over(&self) {
+    fn check_game_over(&mut self) {
         let Self { snake, .. } = self;
         let &Pos { x, y } = snake.body.first().unwrap();
 
         if x >= self.window_width || y >= self.window_height {
-            exit(0)
+            self.is_over = true;
         } else if x <= 0 || y <= 0 {
-            exit(0)
+            self.is_over = true;
         } else if snake
             .body
             .iter()
             .skip(1)
             .any(|pos| pos.x == x && pos.y == y)
         {
-            exit(0)
+            self.is_over = true;
         }
     }
 }
